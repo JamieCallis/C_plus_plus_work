@@ -1,0 +1,82 @@
+#include<iostream>
+#include<vector>
+#include <memory>
+using namespace std;
+
+
+class Test
+{
+private:
+	static const int SIZE = 100;
+	int *_pBuffer{ nullptr };
+public:
+	Test()
+	{
+		_pBuffer = new int[SIZE] {};
+	}
+
+	Test(int i)
+	{
+		_pBuffer = new int[SIZE] {};
+		for (int i = 0; i < SIZE; i++){_pBuffer[i] = 7 * i;}
+	}
+
+	Test(const Test &other)
+	{
+		_pBuffer = new int[SIZE] {};
+		memcpy(_pBuffer, other._pBuffer, SIZE * sizeof(int));
+	}
+	//RValue move constructor
+	Test(Test &&other)
+	{
+		cout << "Move constructor" << endl;
+		_pBuffer = other._pBuffer;
+		other._pBuffer = nullptr;
+	}
+	// standard assignment overload constructor
+	Test &operator=(const Test &other)
+	{
+		_pBuffer = new int[SIZE] {};
+		memcpy(_pBuffer, other._pBuffer, SIZE * sizeof(int));
+		return *this;
+	}
+	// RValue move assignment overload constructor
+	Test &operator=(Test &&other)
+	{
+		delete[] _pBuffer; 
+
+		_pBuffer = other._pBuffer;
+		other._pBuffer = nullptr;
+
+		return *this;
+	}
+	//deconstructor
+	~Test() { delete[] _pBuffer; }
+
+	// assignment overload operator constructor
+	friend ostream &operator<<(ostream &out, const Test &test);
+};
+
+ostream &operator<<(ostream &out, const Test &test)
+{
+	out << "Hello from test";
+	return out;
+}
+
+
+Test getTest()
+{
+	return Test();
+}
+
+
+int main(void)
+{
+	vector<Test> vec;
+	vec.push_back(Test());
+
+	Test test;
+	test = getTest();
+
+	return 0;
+}
